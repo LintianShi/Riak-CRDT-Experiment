@@ -11,7 +11,6 @@ import com.basho.riak.client.core.query.Location;
 import com.basho.riak.client.core.query.Namespace;
 import com.basho.riak.client.core.query.crdt.types.RiakSet;
 import com.basho.riak.client.core.util.BinaryValue;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.LinkedList;
 import java.util.Set;

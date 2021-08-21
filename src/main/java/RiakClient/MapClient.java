@@ -11,8 +11,6 @@ import com.basho.riak.client.core.query.crdt.types.RiakMap;
 import com.basho.riak.client.core.query.crdt.types.RiakRegister;
 import com.basho.riak.client.core.query.crdt.types.RiakSet;
 import com.basho.riak.client.core.util.BinaryValue;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -36,10 +34,6 @@ public class MapClient implements AutoCloseable  {
     private RiakClient riakClient;
     private Location hymap;
     private Map localMap;
-
-    private ObjectMapper myMapper;
-
-
     /*
       @param hosts(hosts格式：127.0.0.1:8081,127.0.0.1:8082,127.0.0.1:8083)
     */
@@ -61,7 +55,6 @@ public class MapClient implements AutoCloseable  {
         RiakCluster riakCluster = RiakCluster.builder(nodes).withExecutionAttempts(retires).build();
         riakCluster.start();
         riakClient = new RiakClient(riakCluster);
-        myMapper = new ObjectMapper();
 
         hymap = new Location(new Namespace("dhmap","customers"), "hy_info");
 
@@ -172,70 +165,70 @@ public class MapClient implements AutoCloseable  {
         System.out.println("Contain Yi?:" + clusterRiakClient.mapContainsValue("Yi"));
         System.out.println(clusterRiakClient.mapPut("first_name","Xuemin2"));
         System.out.println(clusterRiakClient.mapGet("first_name"));
-//        Location hyMap = new Location(new Namespace("dhmap","customers"), "hy_info");
-//        RiakClient client = clusterRiakClient.getRiakClient();
-//
-////        测试Map内封装Register
-//        RegisterUpdate ru1 = new RegisterUpdate("Yi");
-//        RegisterUpdate ru2 = new RegisterUpdate("12345678");
-//        MapUpdate muR = new MapUpdate()
-//                .update("first_name",ru1)
-//                .update("phone_number", ru2);
-//        UpdateMap updateR = new UpdateMap.Builder(hyMap, muR)
-//                .build();
-//        client.execute(updateR);
-//
-//        FetchMap fetchR = new FetchMap.Builder(hyMap)
-//                .build();
-//        FetchMap.Response responseR = client.execute(fetchR);
-//        RiakMap mapR = responseR.getDatatype();
-//
-//        System.out.println("hy_info first_name:" + mapR.getRegister("first_name").view());
-//        System.out.println("do not exist:" + mapR.getRegister("last_name"));
-//
-//        //ContainsValue的实现
-//        Map<BinaryValue, List<RiakDatatype>> m = mapR.view();
-//        Iterator<BinaryValue> it = m.keySet().iterator();
-//        while (it.hasNext()){
-//            BinaryValue currentK = it.next();
-//            String currentV = m.get(currentK).toString();
-//            currentV = currentV.substring(1,currentV.length()-1);
-//            System.out.println("Search key:" + currentK.toString() + " Value:" + currentV);
-//            if(currentV.equals("Yi")){
-//                System.out.println("Aha~");
-//                break;
-//            }
-//        }
-//        System.out.println(m.get(BinaryValue.create("phone_number")));
-//        System.out.println(mapR.view());
-//
-//
-//        Location testMap = new Location(new Namespace("dhmap","customers"), "xm_info");
-//        FetchMap fetchM = new FetchMap.Builder(testMap).build();
-//        FetchMap.Response responseM = client.execute(fetchM);
-//        RiakMap mapM = responseM.getDatatype();
-//        System.out.println(mapM.view());
+        Location hyMap = new Location(new Namespace("dhmap","customers"), "hy_info");
+        RiakClient client = clusterRiakClient.getRiakClient();
 
-//        测试Map内封装Flag
-//        MapUpdate muF = new MapUpdate()
-//                .update("enterprise_customer", new FlagUpdate(true));
-//        UpdateMap updateF = new UpdateMap.Builder(hyMap, muF)
-//                .build();
-//        client.execute(updateF);
-//
-//        FetchMap fetchF = new FetchMap.Builder(hyMap).build();
-//        FetchMap.Response responseF = client.execute(fetchF);
-//        RiakMap mapF = responseF.getDatatype();
-//        System.out.println(mapF.getFlag("enterprise_customer").view());
+//        测试Map内封装Register
+        RegisterUpdate ru1 = new RegisterUpdate("Yi");
+        RegisterUpdate ru2 = new RegisterUpdate("12345678");
+        MapUpdate muR = new MapUpdate()
+                .update("first_name",ru1)
+                .update("phone_number", ru2);
+        UpdateMap updateR = new UpdateMap.Builder(hyMap, muR)
+                .build();
+        client.execute(updateR);
 
-//        测试Map内封装Counter
-//        CounterUpdate cu = new CounterUpdate(1);
-//        MapUpdate muC = new MapUpdate()
-//                .update("page_visits", cu);
-//        UpdateMap updateC = new UpdateMap.Builder(hyMap, muC).build();
-//        client.execute(updateC);
-//
-//
+        FetchMap fetchR = new FetchMap.Builder(hyMap)
+                .build();
+        FetchMap.Response responseR = client.execute(fetchR);
+        RiakMap mapR = responseR.getDatatype();
+
+        System.out.println("hy_info first_name:" + mapR.getRegister("first_name").view());
+        System.out.println("do not exist:" + mapR.getRegister("last_name"));
+
+        //ContainsValue的实现
+        Map<BinaryValue, List<RiakDatatype>> m = mapR.view();
+        Iterator<BinaryValue> it = m.keySet().iterator();
+        while (it.hasNext()){
+            BinaryValue currentK = it.next();
+            String currentV = m.get(currentK).toString();
+            currentV = currentV.substring(1,currentV.length()-1);
+            System.out.println("Search key:" + currentK.toString() + " Value:" + currentV);
+            if(currentV.equals("Yi")){
+                System.out.println("Aha~");
+                break;
+            }
+        }
+        System.out.println(m.get(BinaryValue.create("phone_number")));
+        System.out.println(mapR.view());
+
+
+        Location testMap = new Location(new Namespace("dhmap","customers"), "xm_info");
+        FetchMap fetchM = new FetchMap.Builder(testMap).build();
+        FetchMap.Response responseM = client.execute(fetchM);
+        RiakMap mapM = responseM.getDatatype();
+        System.out.println(mapM.view());
+
+        //测试Map内封装Flag
+        MapUpdate muF = new MapUpdate()
+                .update("enterprise_customer", new FlagUpdate(true));
+        UpdateMap updateF = new UpdateMap.Builder(hyMap, muF)
+                .build();
+        client.execute(updateF);
+
+        FetchMap fetchF = new FetchMap.Builder(hyMap).build();
+        FetchMap.Response responseF = client.execute(fetchF);
+        RiakMap mapF = responseF.getDatatype();
+        System.out.println(mapF.getFlag("enterprise_customer").view());
+
+        //测试Map内封装Counter
+        CounterUpdate cu = new CounterUpdate(1);
+        MapUpdate muC = new MapUpdate()
+                .update("page_visits", cu);
+        UpdateMap updateC = new UpdateMap.Builder(hyMap, muC).build();
+        client.execute(updateC);
+
+
 
         clusterRiakClient.close();
 
