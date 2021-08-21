@@ -13,9 +13,7 @@ import com.basho.riak.client.core.query.crdt.types.RiakSet;
 import com.basho.riak.client.core.util.BinaryValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.regexp.internal.RE;
 
-import javax.swing.text.html.HTMLDocument;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
