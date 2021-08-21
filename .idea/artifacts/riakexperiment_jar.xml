@@ -4,8 +4,6 @@
     <root id="archive" name="riakexperiment.jar">
       <element id="module-output" name="riakexperiment" />
       <element id="extracted-dir" path="$PROJECT_DIR$/Dependencies/riak-client-2.1.1-jar-with-dependencies.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/Dependencies/slf4j-jdk14-1.7.26.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/Dependencies/jackson-core-2.9.9.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
