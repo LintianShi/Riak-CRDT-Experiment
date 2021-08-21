@@ -146,91 +146,91 @@ public class SetClient implements AutoCloseable {
 
     public static void main(String[] args) throws Exception{
         SetClient clusterRiakClient = new SetClient("172.21.252.92:8087,172.21.252.91:8087,172.21.252.93:8087");
-//        Location citiesSet = new Location(new Namespace("dhset", "travel"),"cities");
-//        FetchSet fetch = new FetchSet.Builder(citiesSet).build();
-//        FetchSet.Response response = clusterRiakClient.getRiakClient().execute(fetch);
-//        RiakSet set = response.getDatatype();
-//        boolean isEmpty = set.view().isEmpty();
-//        if(isEmpty){
-//            System.out.println("The set is empty...");
-//        }
-//
-//        SetUpdate su = new SetUpdate()
-//                .add("Edinburgh")
-//                .add("London");
-//        UpdateSet update =  new UpdateSet.Builder(citiesSet, su)
-//                .build();
-//        clusterRiakClient.getRiakClient().execute(update);
-//
-//        FetchSet.Response response1 = clusterRiakClient.getRiakClient().execute(fetch);
-//        isEmpty = response1.getDatatype().view().isEmpty();
-//        if(isEmpty){
-//            System.out.println("The set is empty...");
-//        }
-//        else{
-//            System.out.println("The set is not empty now");
-//        }
-//
-//        Set<BinaryValue> binarySet = response1.getDatatype().view();
-//
-//        for(BinaryValue city: binarySet){
-//            System.out.println(city.toStringUtf8());
-//            if(city.toStringUtf8().equals("London")){
-//                System.out.println("Get London!");
-//            }
-//        }
-//
-//        String s = "London";
-//        RiakSet riakSet = response1.getDatatype();
-//        if(riakSet.contains("London")){
-//            System.out.println("Correct way to get London!");
-//        }
-//        if(riakSet.contains("Edinburgh")){
-//            System.out.println("Correct way to get Ed!");
-//        }
-//
-//
-//        System.out.println("Another way to test contain:");
-//        System.out.println(binarySet.contains(BinaryValue.create("London")));
-//        System.out.println(binarySet.size());
-//
-//        System.out.println("Test remove.");
-//
-//        FetchSet fetchBFRemove = new FetchSet.Builder(citiesSet).build();
-//        FetchSet.Response responseBFRemore = clusterRiakClient.getRiakClient().execute(fetchBFRemove);
-//
-//        Context ctx = responseBFRemore.getContext();
-//        SetUpdate suRemove = new SetUpdate()
-//                .remove("London")
-////                .remove("CCC")
-//                .remove("Edinburgh");
-//        UpdateSet updateRM = new UpdateSet.Builder(citiesSet, suRemove)
-//                .withContext(ctx)
-//                .build();
-//        clusterRiakClient.getRiakClient().execute(updateRM);
-//
-//        FetchSet.Response response2 = clusterRiakClient.getRiakClient().execute(fetch);
-//        isEmpty = response2.getDatatype().view().isEmpty();
-//        if(isEmpty){
-//            System.out.println("The set is empty...");
-//        }
-//        else{
-//            System.out.println("The set is not empty now");
-//        }
-//
-//        riakSet = response2.getDatatype();
-//        if(riakSet.contains("Edinburgh")){
-//            System.out.println("Wrong way to get Ed!");
-//        }
-//        else{
-//            System.out.println("Ed is not here.");
-//        }
-//
-//        Set<BinaryValue> binarySet1 = response2.getDatatype().view();
-//
-//        for(BinaryValue city: binarySet1){
-//            System.out.println(city.toStringUtf8());
-//        }
+        Location citiesSet = new Location(new Namespace("dhset", "travel"),"cities");
+        FetchSet fetch = new FetchSet.Builder(citiesSet).build();
+        FetchSet.Response response = clusterRiakClient.getRiakClient().execute(fetch);
+        RiakSet set = response.getDatatype();
+        boolean isEmpty = set.view().isEmpty();
+        if(isEmpty){
+            System.out.println("The set is empty...");
+        }
+
+        SetUpdate su = new SetUpdate()
+                .add("Edinburgh")
+                .add("London");
+        UpdateSet update =  new UpdateSet.Builder(citiesSet, su)
+                .build();
+        clusterRiakClient.getRiakClient().execute(update);
+
+        FetchSet.Response response1 = clusterRiakClient.getRiakClient().execute(fetch);
+        isEmpty = response1.getDatatype().view().isEmpty();
+        if(isEmpty){
+            System.out.println("The set is empty...");
+        }
+        else{
+            System.out.println("The set is not empty now");
+        }
+
+        Set<BinaryValue> binarySet = response1.getDatatype().view();
+
+        for(BinaryValue city: binarySet){
+            System.out.println(city.toStringUtf8());
+            if(city.toStringUtf8().equals("London")){
+                System.out.println("Get London!");
+            }
+        }
+
+        String s = "London";
+        RiakSet riakSet = response1.getDatatype();
+        if(riakSet.contains("London")){
+            System.out.println("Correct way to get London!");
+        }
+        if(riakSet.contains("Edinburgh")){
+            System.out.println("Correct way to get Ed!");
+        }
+
+
+        System.out.println("Another way to test contain:");
+        System.out.println(binarySet.contains(BinaryValue.create("London")));
+        System.out.println(binarySet.size());
+
+        System.out.println("Test remove.");
+
+        FetchSet fetchBFRemove = new FetchSet.Builder(citiesSet).build();
+        FetchSet.Response responseBFRemore = clusterRiakClient.getRiakClient().execute(fetchBFRemove);
+
+        Context ctx = responseBFRemore.getContext();
+        SetUpdate suRemove = new SetUpdate()
+                .remove("London")
+//                .remove("CCC")
+                .remove("Edinburgh");
+        UpdateSet updateRM = new UpdateSet.Builder(citiesSet, suRemove)
+                .withContext(ctx)
+                .build();
+        clusterRiakClient.getRiakClient().execute(updateRM);
+
+        FetchSet.Response response2 = clusterRiakClient.getRiakClient().execute(fetch);
+        isEmpty = response2.getDatatype().view().isEmpty();
+        if(isEmpty){
+            System.out.println("The set is empty...");
+        }
+        else{
+            System.out.println("The set is not empty now");
+        }
+
+        riakSet = response2.getDatatype();
+        if(riakSet.contains("Edinburgh")){
+            System.out.println("Wrong way to get Ed!");
+        }
+        else{
+            System.out.println("Ed is not here.");
+        }
+
+        Set<BinaryValue> binarySet1 = response2.getDatatype().view();
+
+        for(BinaryValue city: binarySet1){
+            System.out.println(city.toStringUtf8());
+        }
 
         clusterRiakClient.close();
 
