@@ -40,6 +40,8 @@ public class RiakExpRunner {
         //关闭环境
         initTestDataType();
         SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
+        System.out.println(setClient.execute("contains", "Messi"));
+        System.out.println(setClient.execute("contains", "Lukaku"));
         setClient.execute("add", "Messi");
         setClient.execute("add", "Lukaku");
         System.out.println(setClient.execute("contains", "Messi"));
@@ -49,17 +51,22 @@ public class RiakExpRunner {
         System.out.println(setClient.execute("contains", "Lukaku"));
 
         clean();
+        shutdown();
     }
 
-    public void initTestDataType() {
+    private void initTestDataType() {
         testDataType = new Location(new Namespace("dhset", "test"),"testdata");
     }
 
 
-    public void clean() throws Exception {
+    private void clean() throws Exception {
         RiakClient riakClient = expEnvironment.newClient();
         DeleteValue delete = new DeleteValue.Builder(testDataType).build();
         riakClient.execute(delete);
+    }
+
+    private void shutdown() {
+        expEnvironment.shutdown();
     }
 
     public static void main(String[] args) throws Exception {

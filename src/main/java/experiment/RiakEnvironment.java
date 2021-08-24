@@ -41,7 +41,7 @@ public class RiakEnvironment {
         return new RiakClient(this.riakCluster);
     }
 
-    public Future<Boolean> close() {
+    public Future<Boolean> shutdown() {
         return this.riakCluster.shutdown();
     }
 
