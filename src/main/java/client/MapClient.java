@@ -1,4 +1,4 @@
-package RiakClient;
+package client;
 
 import com.basho.riak.client.api.RiakClient;
 import com.basho.riak.client.api.commands.datatypes.*;
@@ -8,20 +8,14 @@ import com.basho.riak.client.core.query.Location;
 import com.basho.riak.client.core.query.Namespace;
 import com.basho.riak.client.core.query.crdt.types.RiakDatatype;
 import com.basho.riak.client.core.query.crdt.types.RiakMap;
-import com.basho.riak.client.core.query.crdt.types.RiakRegister;
-import com.basho.riak.client.core.query.crdt.types.RiakSet;
 import com.basho.riak.client.core.util.BinaryValue;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-//public class myRiakMap extends RiakMap{
-//    public myRiakMap(List<RiakMap.MapEntry> mapEntries){
-//        super (mapEntries);
-//    }
-//}
+import client.RiakExpClient;
 
-public class MapClient implements AutoCloseable  {
+public class MapClient  {
 
     private final static int DEFAULTMAXCONNECTIONS = 50;
     private final static int DEFAULTMINCONNECTIONS = 10;
