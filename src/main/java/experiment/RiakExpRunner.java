@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
 import client.SetClient;
 import client.RiakExpClient;
@@ -29,7 +30,7 @@ public class RiakExpRunner {
     private int clientNum;
     private Location testDataType;
     private ExpGenerator generator;
-    private List<RiakClientThread> threadList = new LinkedList<>();
+    private List<Thread> threadList = new LinkedList<>();
     private List<RiakClientLog> logs = new ArrayList<>();
 
 
@@ -55,14 +56,15 @@ public class RiakExpRunner {
         //线程初始化
         System.out.println("Init Client...");
         CountDownLatch countDownLatch = new CountDownLatch(clientNum);
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(clientNum);
             //线程绑定客户端
         for (int i = 0; i < clientNum; i++) {
-            threadList.add(new RiakClientThread(new SetClient(expEnvironment.newClient()), generator, intervalTime, logs.get(i), countDownLatch));
+            threadList.add(new Thread(new RiakClientThread(new SetClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch, cyclicBarrier)));
         }
         //启动线程
         System.out.println("Start Client...");
-        for (RiakClientThread thread : threadList) {
-            thread.run();
+        for (Thread thread : threadList) {
+            thread.start();
         }
         //结束线程
         countDownLatch.await();
@@ -117,17 +119,20 @@ class RiakClientThread implements Runnable {
     private long intervalTime;
     private RiakClientLog threadLog;
     private CountDownLatch countDownLatch;
+    private CyclicBarrier cyclicBarrier;
 
-    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch) {
+    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch, CyclicBarrier cyclicBarrier) {
         this.riakClient = client;
         this.generator = generator;
         this.intervalTime = (long)(intervalTime * 1000);
         this.threadLog = threadLog;
         this.countDownLatch = countDownLatch;
+        this.cyclicBarrier = cyclicBarrier;
     }
 
     public void run() {
         try {
+            //cyclicBarrier.await();
             while (generator.isRunning()) {
                 RiakOperation operation = generator.generate();
                 Thread.sleep(intervalTime);
