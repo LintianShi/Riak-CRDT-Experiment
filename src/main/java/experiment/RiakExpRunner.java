@@ -5,6 +5,7 @@ import com.basho.riak.client.api.commands.kv.DeleteValue;
 import com.basho.riak.client.core.query.Location;
 import com.basho.riak.client.core.query.Namespace;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +16,7 @@ import experiment.RiakEnvironment;
 import generator.ExpGenerator;
 import generator.SetExpGenerator;
 import record.RiakOperation;
+import record.RiakClientLog;
 
 public class RiakExpRunner {
     private RiakEnvironment expEnvironment;
@@ -28,6 +30,7 @@ public class RiakExpRunner {
     private Location testDataType;
     private ExpGenerator generator;
     private List<RiakClientThread> threadList = new LinkedList<>();
+    private List<RiakClientLog> logs = new ArrayList<>();
 
 
     public RiakExpRunner() {
@@ -45,12 +48,16 @@ public class RiakExpRunner {
         //初始化generator
         System.out.println("Init Wordload Generator...");
         generator = new SetExpGenerator(100);
+        //初始化Log
+        for (int i = 0; i < clientNum; i++) {
+            logs.add(new RiakClientLog());
+        }
         //线程初始化
         System.out.println("Init Client...");
         CountDownLatch countDownLatch = new CountDownLatch(clientNum);
             //线程绑定客户端
         for (int i = 0; i < clientNum; i++) {
-            threadList.add(new RiakClientThread(new SetClient(expEnvironment.newClient()), generator, intervalTime, countDownLatch));
+            threadList.add(new RiakClientThread(new SetClient(expEnvironment.newClient()), generator, intervalTime, logs.get(i), countDownLatch));
         }
         //启动线程
         System.out.println("Start Client...");
@@ -66,6 +73,10 @@ public class RiakExpRunner {
         //关闭环境
         System.out.println("Shutdown Environment...");
         shutdown();
+
+        for (RiakClientLog log : logs) {
+            System.out.println(log);
+        }
 
 //        SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
 //        System.out.println(setClient.executeByArgs("contains", "Messi"));
@@ -104,12 +115,14 @@ class RiakClientThread implements Runnable {
     private RiakExpClient riakClient;
     private ExpGenerator generator;
     private long intervalTime;
+    private RiakClientLog threadLog;
     private CountDownLatch countDownLatch;
 
-    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, CountDownLatch countDownLatch) {
+    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch) {
         this.riakClient = client;
         this.generator = generator;
         this.intervalTime = (long)(intervalTime * 1000);
+        this.threadLog = threadLog;
         this.countDownLatch = countDownLatch;
     }
 
@@ -118,7 +131,9 @@ class RiakClientThread implements Runnable {
             while (generator.isRunning()) {
                 RiakOperation operation = generator.generate();
                 Thread.sleep(intervalTime);
-                System.out.println(riakClient.execute(operation));
+                String retValue = riakClient.execute(operation);
+                operation.setRetValue(retValue);
+                threadLog.appendLog(operation);
             }
         } catch (Exception e) {
             e.printStackTrace();
