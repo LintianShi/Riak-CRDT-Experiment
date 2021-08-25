@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import client.RiakExpClient;
+import record.RiakOperation;
 
 public class SetClient extends RiakExpClient {
     public SetClient(RiakClient riakClient){
@@ -60,7 +61,13 @@ public class SetClient extends RiakExpClient {
         }
     }
 
-    public String execute(String operationName, String...args) throws Exception {
+    public String execute(RiakOperation operation) throws Exception {
+        String operationName = (String)operation.getOperationName();
+        String element = (String)operation.getArguments().get(0);
+        return executeByArgs(operationName, element);
+    }
+
+    public String executeByArgs(String operationName, String...args) throws Exception {
         if (operationName.equals("add")) {
             add(args[0]);
             return "null";

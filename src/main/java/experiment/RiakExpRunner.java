@@ -3,13 +3,18 @@ package experiment;
 import com.basho.riak.client.api.RiakClient;
 import com.basho.riak.client.api.commands.kv.DeleteValue;
 import com.basho.riak.client.core.query.Location;
+import com.basho.riak.client.core.query.Namespace;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import client.SetClient;
-import com.basho.riak.client.core.query.Namespace;
+import client.RiakExpClient;
 import experiment.RiakEnvironment;
+import generator.ExpGenerator;
+import generator.SetExpGenerator;
+import record.RiakOperation;
 
 public class RiakExpRunner {
     private RiakEnvironment expEnvironment;
@@ -19,39 +24,51 @@ public class RiakExpRunner {
     private static int OP_PER_SEC = 300;
 
     private double intervalTime;
+    private int clientNum;
     private Location testDataType;
+    private ExpGenerator generator;
     private List<RiakClientThread> threadList = new LinkedList<>();
 
 
     public RiakExpRunner() {
         expEnvironment = new RiakEnvironment(SERVER_NUM);
         intervalTime = (double)(SERVER_NUM * THREAD_PER_SERVER) / OP_PER_SEC;
+        clientNum = SERVER_NUM * THREAD_PER_SERVER;
     }
 
     public void run() throws Exception {
         //初始化环境，在构造函数里
         //初始化测试对象
-        //线程初始化
-            //线程绑定客户端
-        //启动线程
-
-        //结束线程
-        //清楚测试对象
-        //关闭环境
         initTestDataType();
-        SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
-        System.out.println(setClient.execute("contains", "Messi"));
-        System.out.println(setClient.execute("contains", "Lukaku"));
-        setClient.execute("add", "Messi");
-        setClient.execute("add", "Lukaku");
-        System.out.println(setClient.execute("contains", "Messi"));
-        System.out.println(setClient.execute("contains", "Lukaku"));
-        setClient.execute("remove", "Lukaku");
-        System.out.println(setClient.execute("contains", "Messi"));
-        System.out.println(setClient.execute("contains", "Lukaku"));
-
+        //初始化generator
+        generator = new SetExpGenerator(100);
+        //线程初始化
+        CountDownLatch countDownLatch = new CountDownLatch(clientNum);
+            //线程绑定客户端
+        for (int i = 0; i < clientNum; i++) {
+            threadList.add(new RiakClientThread(new SetClient(expEnvironment.newClient()), generator, intervalTime, countDownLatch));
+        }
+        //启动线程
+        for (RiakClientThread thread : threadList) {
+            thread.run();
+        }
+        //结束线程
+        countDownLatch.await();
+        //清除测试对象
         clean();
+        //关闭环境
         shutdown();
+
+//        SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
+//        System.out.println(setClient.executeByArgs("contains", "Messi"));
+//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
+//        setClient.executeByArgs("add", "Messi");
+//        setClient.executeByArgs("add", "Lukaku");
+//        System.out.println(setClient.executeByArgs("contains", "Messi"));
+//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
+//        setClient.executeByArgs("remove", "Lukaku");
+//        System.out.println(setClient.executeByArgs("contains", "Messi"));
+//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
     }
 
     private void initTestDataType() {
@@ -76,5 +93,29 @@ public class RiakExpRunner {
 }
 
 class RiakClientThread implements Runnable {
-    public void run() {}
+    private RiakExpClient riakClient;
+    private ExpGenerator generator;
+    private long intervalTime;
+    private CountDownLatch countDownLatch;
+
+    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, CountDownLatch countDownLatch) {
+        this.riakClient = client;
+        this.generator = generator;
+        this.intervalTime = (long)(intervalTime * 1000);
+        this.countDownLatch = countDownLatch;
+    }
+
+    public void run() {
+        try {
+            while (generator.isRunning()) {
+                RiakOperation operation = generator.generate();
+                Thread.sleep(intervalTime);
+                System.out.println(riakClient.execute(operation));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            countDownLatch.countDown();
+        }
+    }
 }
