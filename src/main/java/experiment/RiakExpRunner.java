@@ -38,25 +38,33 @@ public class RiakExpRunner {
 
     public void run() throws Exception {
         //初始化环境，在构造函数里
+        System.out.println("Init Riak Environment...");
         //初始化测试对象
         initTestDataType();
+        System.out.println("Init Test Data Type...");
         //初始化generator
+        System.out.println("Init Wordload Generator...");
         generator = new SetExpGenerator(100);
         //线程初始化
+        System.out.println("Init Client...");
         CountDownLatch countDownLatch = new CountDownLatch(clientNum);
             //线程绑定客户端
         for (int i = 0; i < clientNum; i++) {
             threadList.add(new RiakClientThread(new SetClient(expEnvironment.newClient()), generator, intervalTime, countDownLatch));
         }
         //启动线程
+        System.out.println("Start Client...");
         for (RiakClientThread thread : threadList) {
             thread.run();
         }
         //结束线程
         countDownLatch.await();
+        System.out.println("Shutdown Client...");
         //清除测试对象
+        System.out.println("Clean Test Data Type...");
         clean();
         //关闭环境
+        System.out.println("Shutdown Environment...");
         shutdown();
 
 //        SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
