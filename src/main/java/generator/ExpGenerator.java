@@ -53,6 +53,6 @@ public abstract class ExpGenerator {
     }
 
     public boolean isRunning() {
-        return atomicInteger.get() > totalOps;
+        return atomicInteger.get() < totalOps;
     }
 }

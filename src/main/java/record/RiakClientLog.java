@@ -20,5 +20,4 @@ public class RiakClientLog {
         for (RiakOperation operation : operationList) {
             bw.write(operation.toString() + "\n");
         }
-    }
 }
