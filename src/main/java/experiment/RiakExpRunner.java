@@ -15,12 +15,13 @@ import java.io.File;
 import client.SetClient;
 import client.RiakExpClient;
 import experiment.RiakEnvironment;
+import experiment.SetRunner;
 import generator.ExpGenerator;
 import generator.SetExpGenerator;
 import record.RiakOperation;
 import record.RiakClientLog;
 
-public class RiakExpRunner {
+public abstract class RiakExpRunner {
     private RiakEnvironment expEnvironment;
 
     private static int SERVER_NUM = 3;
@@ -31,10 +32,8 @@ public class RiakExpRunner {
     private static int CLIENT_NUM = 3;
 
     private double intervalTime;
-    private int clientNum;
-    private String dataType = "Set";
-    private String pattern = "Default";
-    private Location testDataType;
+    protected String dataType;
+    protected Location testDataType;
     private ExpGenerator generator;
     private List<Thread> threadList = new LinkedList<>();
     private List<RiakClientLog> logs = new ArrayList<>();
@@ -43,7 +42,6 @@ public class RiakExpRunner {
     public RiakExpRunner() {
         expEnvironment = new RiakEnvironment(SERVER_NUM);
         intervalTime = (double)(SERVER_NUM * THREAD_PER_SERVER) / OP_PER_SEC;
-        clientNum = SERVER_NUM * THREAD_PER_SERVER;
     }
 
     public void run() throws Exception {
@@ -54,7 +52,7 @@ public class RiakExpRunner {
         System.out.println("Init Test Data Type...");
         //初始化generator
         System.out.println("Init Wordload Generator...");
-        generator = new SetExpGenerator(TOTAL_OPS, pattern);
+        generator = new SetExpGenerator(TOTAL_OPS, WORKLOAD_PATTERN);
         //初始化Log
         for (int i = 0; i < CLIENT_NUM; i++) {
             logs.add(new RiakClientLog());
@@ -64,7 +62,7 @@ public class RiakExpRunner {
         CountDownLatch countDownLatch = new CountDownLatch(CLIENT_NUM);
         //线程绑定客户端
         for (int i = 0; i < CLIENT_NUM; i++) {
-            threadList.add(new Thread(new RiakClientThread(new SetClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch)));
+            threadList.add(new Thread(new RiakClientThread(initClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch)));
         }
         //启动线程
         System.out.println("Start Client...");
@@ -85,13 +83,13 @@ public class RiakExpRunner {
         outputTrace();
     }
 
-    private void initTestDataType() {
-        testDataType = new Location(new Namespace("dhset", "test"),"testdata");
-    }
+    protected abstract void initTestDataType();
+
+    protected abstract RiakExpClient initClient(RiakClient riakClient, Location location);
 
     private void outputTrace() {
         long ts = System.currentTimeMillis();
-        String filename = "result/" + dataType + "_" + pattern + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(clientNum) + "_" + Integer.toString(OP_PER_SEC) + "_" + Long.toString(ts);
+        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(OP_PER_SEC) + "_" + Long.toString(ts);
         File file = new File(filename);
         file.mkdir();
         try {
@@ -115,7 +113,7 @@ public class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        RiakExpRunner runner = new RiakExpRunner();
+        RiakExpRunner runner = new SetRunner();
         runner.run();
     }
 }
