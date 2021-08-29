@@ -16,6 +16,7 @@ import client.SetClient;
 import client.RiakExpClient;
 import experiment.RiakEnvironment;
 import experiment.SetRunner;
+import experiment.MapRunner;
 import generator.ExpGenerator;
 import generator.SetExpGenerator;
 import record.RiakOperation;
@@ -52,7 +53,7 @@ public abstract class RiakExpRunner {
         System.out.println("Init Test Data Type...");
         //初始化generator
         System.out.println("Init Wordload Generator...");
-        generator = new SetExpGenerator(TOTAL_OPS, WORKLOAD_PATTERN);
+        generator = initGenerator(TOTAL_OPS, WORKLOAD_PATTERN);
         //初始化Log
         for (int i = 0; i < CLIENT_NUM; i++) {
             logs.add(new RiakClientLog());
@@ -87,6 +88,8 @@ public abstract class RiakExpRunner {
 
     protected abstract RiakExpClient initClient(RiakClient riakClient, Location location);
 
+    protected abstract ExpGenerator initGenerator(int totalOps, String pattern);
+
     private void outputTrace() {
         long ts = System.currentTimeMillis();
         String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(OP_PER_SEC) + "_" + Long.toString(ts);
@@ -113,7 +116,7 @@ public abstract class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        RiakExpRunner runner = new SetRunner();
+        RiakExpRunner runner = new MapRunner();
         runner.run();
     }
 }
