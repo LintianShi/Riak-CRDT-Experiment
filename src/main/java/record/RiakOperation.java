@@ -38,6 +38,11 @@ public class RiakOperation {
     }
 
     public String toString() {
-        return operationName + ", " + arguments.toString() + ", " + retValue;
+        String str = operationName;
+        for (String arg : arguments) {
+            str += "," + arg;
+        }
+        str += "," + retValue;
+        return str;
     }
 }

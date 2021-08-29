@@ -24,9 +24,12 @@ public class RiakExpRunner {
     private static int SERVER_NUM = 3;
     private static int THREAD_PER_SERVER = 1;
     private static int OP_PER_SEC = 300;
+    private static int TOTAL_OPS = 500;
 
     private double intervalTime;
     private int clientNum;
+    private String dataType = "Set";
+    private String pattern = "Default";
     private Location testDataType;
     private ExpGenerator generator;
     private List<RiakClientThread> threadList = new LinkedList<>();
@@ -47,7 +50,7 @@ public class RiakExpRunner {
         System.out.println("Init Test Data Type...");
         //初始化generator
         System.out.println("Init Wordload Generator...");
-        generator = new SetExpGenerator(100);
+        generator = new SetExpGenerator(TOTAL_OPS);
         //初始化Log
         for (int i = 0; i < clientNum; i++) {
             logs.add(new RiakClientLog());
@@ -74,26 +77,25 @@ public class RiakExpRunner {
         System.out.println("Shutdown Environment...");
         shutdown();
 
-        for (RiakClientLog log : logs) {
-            System.out.println(log);
-        }
-
-//        SetClient setClient = new SetClient(expEnvironment.newClient(), testDataType);
-//        System.out.println(setClient.executeByArgs("contains", "Messi"));
-//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
-//        setClient.executeByArgs("add", "Messi");
-//        setClient.executeByArgs("add", "Lukaku");
-//        System.out.println(setClient.executeByArgs("contains", "Messi"));
-//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
-//        setClient.executeByArgs("remove", "Lukaku");
-//        System.out.println(setClient.executeByArgs("contains", "Messi"));
-//        System.out.println(setClient.executeByArgs("contains", "Lukaku"));
+        //输出日志
+        outputTrace();
     }
 
     private void initTestDataType() {
         testDataType = new Location(new Namespace("dhset", "test"),"testdata");
     }
 
+    private void outputTrace() {
+        String filename = dataType + "_" + pattern + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(clientNum) + "_" + Integer.toString(OP_PER_SEC);
+        try {
+            for (int i = 0; i < logs.size(); i++) {
+                logs.get(i).outputLog(filename + "_" + Integer.toString(i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     private void clean() throws Exception {
         RiakClient riakClient = expEnvironment.newClient();
