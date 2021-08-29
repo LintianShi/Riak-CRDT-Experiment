@@ -27,6 +27,8 @@ public class RiakExpRunner {
     private static int THREAD_PER_SERVER = 1;
     private static int OP_PER_SEC = 300;
     private static int TOTAL_OPS = 500;
+    private static String WORKLOAD_PATTERN = "default";
+    private static int CLIENT_NUM = 3;
 
     private double intervalTime;
     private int clientNum;
@@ -52,18 +54,17 @@ public class RiakExpRunner {
         System.out.println("Init Test Data Type...");
         //初始化generator
         System.out.println("Init Wordload Generator...");
-        generator = new SetExpGenerator(TOTAL_OPS);
+        generator = new SetExpGenerator(TOTAL_OPS, pattern);
         //初始化Log
-        for (int i = 0; i < clientNum; i++) {
+        for (int i = 0; i < CLIENT_NUM; i++) {
             logs.add(new RiakClientLog());
         }
         //线程初始化
         System.out.println("Init Client...");
-        CountDownLatch countDownLatch = new CountDownLatch(clientNum);
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(clientNum);
-            //线程绑定客户端
-        for (int i = 0; i < clientNum; i++) {
-            threadList.add(new Thread(new RiakClientThread(new SetClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch, cyclicBarrier)));
+        CountDownLatch countDownLatch = new CountDownLatch(CLIENT_NUM);
+        //线程绑定客户端
+        for (int i = 0; i < CLIENT_NUM; i++) {
+            threadList.add(new Thread(new RiakClientThread(new SetClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch)));
         }
         //启动线程
         System.out.println("Start Client...");
@@ -125,29 +126,29 @@ class RiakClientThread implements Runnable {
     private long intervalTime;
     private RiakClientLog threadLog;
     private CountDownLatch countDownLatch;
-    private CyclicBarrier cyclicBarrier;
 
-    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch, CyclicBarrier cyclicBarrier) {
+    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch) {
         this.riakClient = client;
         this.generator = generator;
         this.intervalTime = (long)(intervalTime * 1000);
         this.threadLog = threadLog;
         this.countDownLatch = countDownLatch;
-        this.cyclicBarrier = cyclicBarrier;
     }
 
     public void run() {
-            while (generator.isRunning()) {
-                try {
-                    RiakOperation operation = generator.generate();
-                    Thread.sleep(intervalTime);
-                    String retValue = riakClient.execute(operation);
-                    operation.setRetValue(retValue);
-                    threadLog.appendLog(operation);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        while (generator.isRunning()) {
+            try {
+                RiakOperation operation = generator.generate();
+                operation.setStartTime(System.currentTimeMillis());
+                String retValue = riakClient.execute(operation);
+                operation.setEndTime(System.currentTimeMillis());
+                operation.setRetValue(retValue);
+                threadLog.appendLog(operation);
+                Thread.sleep(intervalTime);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            countDownLatch.countDown();
+        }
+        countDownLatch.countDown();
     }
 }

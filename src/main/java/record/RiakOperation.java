@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RiakOperation {
+    private long startTime;
+    private long endTime;
     private String operationName;
     private List<String> arguments;
     private String retValue;
@@ -37,8 +39,16 @@ public class RiakOperation {
         this.arguments.add(argument);
     }
 
+    public void setStartTime(long ts) {
+        this.startTime = ts;
+    }
+
+    public void setEndTime(long ts) {
+        this.endTime = ts;
+    }
+
     public String toString() {
-        String str = operationName;
+        String str = Long.toString(startTime) + "," + Long.toString(endTime) + "," + operationName;
         for (String arg : arguments) {
             str += "," + arg;
         }
