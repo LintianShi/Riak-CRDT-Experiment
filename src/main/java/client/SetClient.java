@@ -68,21 +68,26 @@ public class SetClient extends RiakExpClient {
     }
 
     public String executeByArgs(String operationName, String...args) throws Exception {
-        if (operationName.equals("add")) {
-            add(args[0]);
-            return "null";
-        } else if (operationName.equals("remove")) {
-            remove(args[0]);
-            return "null";
-        } else if (operationName.equals("contains")) {
-            boolean flag = contains(args[0]);
-            if (flag) {
-                return "true";
+        try {
+            if (operationName.equals("add")) {
+                add(args[0]);
+                return "null";
+            } else if (operationName.equals("remove")) {
+                remove(args[0]);
+                return "null";
+            } else if (operationName.equals("contains")) {
+                boolean flag = contains(args[0]);
+                if (flag) {
+                    return "true";
+                } else {
+                    return "false";
+                }
             } else {
-                return "false";
+                throw new Exception("Invalid Op");
             }
-        } else {
-            throw new Exception("Invalid operation");
+        } catch (Exception e) {
+            throw new Exception(operationName + "_" + args[0]);
         }
+        
     }
 }

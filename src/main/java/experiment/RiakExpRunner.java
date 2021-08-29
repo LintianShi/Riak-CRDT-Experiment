@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.io.File;
 
 import client.SetClient;
 import client.RiakExpClient;
@@ -88,10 +89,13 @@ public class RiakExpRunner {
     }
 
     private void outputTrace() {
-        String filename = dataType + "_" + pattern + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(clientNum) + "_" + Integer.toString(OP_PER_SEC);
+        long ts = System.currentTimeMillis();
+        String filename = "result/" + dataType + "_" + pattern + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(clientNum) + "_" + Integer.toString(OP_PER_SEC) + "_" + Long.toString(ts);
+        File file = new File(filename);
+        file.mkdir();
         try {
             for (int i = 0; i < logs.size(); i++) {
-                logs.get(i).outputLog(filename + "_" + Integer.toString(i));
+                logs.get(i).outputLog(filename + "/" + Integer.toString(i) + ".trc");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,19 +137,17 @@ class RiakClientThread implements Runnable {
     }
 
     public void run() {
-        try {
-            //cyclicBarrier.await();
             while (generator.isRunning()) {
-                RiakOperation operation = generator.generate();
-                Thread.sleep(intervalTime);
-                String retValue = riakClient.execute(operation);
-                operation.setRetValue(retValue);
-                threadLog.appendLog(operation);
+                try {
+                    RiakOperation operation = generator.generate();
+                    Thread.sleep(intervalTime);
+                    String retValue = riakClient.execute(operation);
+                    operation.setRetValue(retValue);
+                    threadLog.appendLog(operation);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
             countDownLatch.countDown();
-        }
     }
 }
