@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RiakOperation {
-    private long startTime;
-    private long endTime;
+    private long startTime = 0;
+    private long endTime = 0;
     private String operationName;
     private List<String> arguments;
-    private String retValue;
+    private String retValue = "none";
 
     public RiakOperation() {
         arguments = new ArrayList<>();

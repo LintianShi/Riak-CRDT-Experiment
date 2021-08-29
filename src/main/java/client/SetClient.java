@@ -29,7 +29,7 @@ public class SetClient extends RiakExpClient {
         super(riakClient, location);
     }
 
-    private void add(String element) throws ExecutionException, InterruptedException{
+    private void add(String element) throws ExecutionException, InterruptedException {
         SetUpdate su = new SetUpdate()
                 .add(element);
         UpdateSet update = new UpdateSet.Builder(testDataType, su)
@@ -37,7 +37,7 @@ public class SetClient extends RiakExpClient {
         this.riakClient.execute(update);
     }
 
-    private void remove(String element) throws ExecutionException, InterruptedException{
+    private void remove(String element) throws ExecutionException, InterruptedException {
         FetchSet fetch = new FetchSet.Builder(testDataType).build();
         FetchSet.Response response = this.riakClient.execute(fetch);
         Context ctx = response.getContext(); //Causal context
@@ -62,8 +62,8 @@ public class SetClient extends RiakExpClient {
     }
 
     public String execute(RiakOperation operation) throws Exception {
-        String operationName = (String)operation.getOperationName();
-        String element = (String)operation.getArguments().get(0);
+        String operationName = operation.getOperationName();
+        String element = operation.getArguments().get(0);
         return executeByArgs(operationName, element);
     }
 

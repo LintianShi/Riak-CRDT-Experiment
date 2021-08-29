@@ -3,12 +3,11 @@ package generator;
 import record.RiakOperation;
 import generator.ExpGenerator;
 
-import java.util.Random;
-
 public class SetExpGenerator extends ExpGenerator {
     private double proportionAdd;
     private double proportionRemove;
     private double proportionContains;
+    private int maxElement = 100;
 
     public SetExpGenerator(int totalOps) {
         super(totalOps, "default");
@@ -41,7 +40,7 @@ public class SetExpGenerator extends ExpGenerator {
             operation = new RiakOperation("contains");
         }
 
-        int element = randInt();
+        int element = randInt(maxElement);
         operation.addArgument(Integer.toString(element));
         return operation;
     }
@@ -56,6 +55,10 @@ public class SetExpGenerator extends ExpGenerator {
 
     public void setProportionContains(double proportionContains) {
         this.proportionContains = proportionContains;
+    }
+
+    public void setMaxElement(int maxElement) {
+        this.maxElement = maxElement;
     }
 
     public static void main(String[] args) {

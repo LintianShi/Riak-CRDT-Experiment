@@ -7,7 +7,6 @@ import record.RiakOperation;
 
 public abstract class ExpGenerator {
     private Random rand = new Random();
-    private int maxElement = 100;
     private int totalOps;
     private String pattern;
     private AtomicInteger atomicInteger = new AtomicInteger(0);
@@ -24,20 +23,12 @@ public abstract class ExpGenerator {
         return generateOperation();
     }
 
-    protected int randInt() {
-        return rand.nextInt(maxElement);
-    }
-
-    public void setMaxElement(int maxElement) {
-        this.maxElement = maxElement;
+    protected int randInt(int bound) {
+        return rand.nextInt(bound);
     }
 
     public void setPattern(String pattern) {
         this.pattern = pattern;
-    }
-
-    public int getMaxElement() {
-        return maxElement;
     }
 
     public String getPattern() {
