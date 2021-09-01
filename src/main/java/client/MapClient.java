@@ -34,7 +34,7 @@ public class MapClient extends RiakExpClient {
                 .update(key,ru);
         UpdateMap updateR = new UpdateMap.Builder(testDataType, muR).build();
         riakClient.execute(updateR);
-        return putResult;
+        return "null";
     }
 
     private String get(String key) throws ExecutionException, InterruptedException {

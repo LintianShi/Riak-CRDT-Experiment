@@ -28,7 +28,7 @@ public abstract class RiakExpRunner {
     private static int SERVER_NUM = 3;
     private static int THREAD_PER_SERVER = 1;
     private static int OP_PER_SEC = 300;
-    private static int TOTAL_OPS = 500;
+    private static int TOTAL_OPS = 200;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
