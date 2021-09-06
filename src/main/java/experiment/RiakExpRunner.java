@@ -27,8 +27,8 @@ public abstract class RiakExpRunner {
 
     private static int SERVER_NUM = 3;
     private static int THREAD_PER_SERVER = 1;
-    private static int OP_PER_SEC = 300;
-    private static int TOTAL_OPS = 200;
+    private static int OP_PER_SEC = 100;
+    private static int TOTAL_OPS = 300;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
@@ -92,7 +92,7 @@ public abstract class RiakExpRunner {
 
     private void outputTrace() {
         long ts = System.currentTimeMillis();
-        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(OP_PER_SEC) + "_" + Long.toString(ts);
+        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(OP_PER_SEC) + "_" + Integer.toString(TOTAL_OPS) + "_" + Long.toString(ts);
         File file = new File(filename);
         file.mkdir();
         try {
@@ -116,7 +116,7 @@ public abstract class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        RiakExpRunner runner = new MapRunner();
+        RiakExpRunner runner = new SetRunner();
         runner.run();
     }
 }
