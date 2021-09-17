@@ -27,7 +27,7 @@ public abstract class RiakExpRunner {
 
     private static int SERVER_NUM = 3;
     private static int THREAD_PER_SERVER = 1;
-    private static int OP_PER_SEC = 100;
+    private static int OP_PER_SEC = 1000;
     private static int TOTAL_OPS = 300;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
@@ -66,12 +66,14 @@ public abstract class RiakExpRunner {
             threadList.add(new Thread(new RiakClientThread(initClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch)));
         }
         //启动线程
+        Long startTime = System.currentTimeMillis();
         System.out.println("Start Client...");
         for (Thread thread : threadList) {
             thread.start();
         }
         //结束线程
         countDownLatch.await();
+        Long endTime = System.currentTimeMillis();
         System.out.println("Shutdown Client...");
         //清除测试对象
         System.out.println("Clean Test Data Type...");
@@ -79,6 +81,7 @@ public abstract class RiakExpRunner {
         //关闭环境
         System.out.println("Shutdown Environment...");
         shutdown();
+        System.out.printf("Total %d ms, %d ops \n", endTime - startTime, generator.getTotalOps());
 
         //输出日志
         outputTrace();
