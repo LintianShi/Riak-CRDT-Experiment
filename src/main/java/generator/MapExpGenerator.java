@@ -15,6 +15,7 @@ public class MapExpGenerator extends ExpGenerator {
         proportionPut = 0.7;
         proportionGet = 0.15;
         proportionContainsValue = 0.15;
+        init();
     }
 
     public MapExpGenerator(int totalOps, String pattern) {
@@ -28,6 +29,7 @@ public class MapExpGenerator extends ExpGenerator {
             proportionGet = 0.15;
             proportionContainsValue = 0.15;
         }
+        init();
     }
 
     protected RiakOperation generateOperation() {
@@ -73,9 +75,6 @@ public class MapExpGenerator extends ExpGenerator {
 
     public static void main(String[] args) {
         ExpGenerator generator = new MapExpGenerator(100);
-        System.out.println(generator.generate());
-        System.out.println(generator.generate());
-        System.out.println(generator.generate());
     }
 
 }

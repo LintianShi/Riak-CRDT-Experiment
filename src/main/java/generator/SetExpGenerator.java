@@ -3,17 +3,21 @@ package generator;
 import record.RiakOperation;
 import generator.ExpGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SetExpGenerator extends ExpGenerator {
     private double proportionAdd;
     private double proportionRemove;
     private double proportionContains;
-    private int maxElement = 100;
+    private int maxElement = 20;
 
     public SetExpGenerator(int totalOps) {
         super(totalOps, "default");
         proportionAdd = 0.6;
         proportionRemove = 0.3;
         proportionContains = 0.1;
+        init();
     }
 
     public SetExpGenerator(int totalOps, String pattern) {
@@ -27,6 +31,7 @@ public class SetExpGenerator extends ExpGenerator {
             proportionRemove = 0.3;
             proportionContains = 0.1;
         }
+        init();
     }
 
     protected RiakOperation generateOperation() {
@@ -63,8 +68,6 @@ public class SetExpGenerator extends ExpGenerator {
 
     public static void main(String[] args) {
         SetExpGenerator generator = new SetExpGenerator(100);
-        System.out.println(generator.generate());
-        System.out.println(generator.generate());
-        System.out.println(generator.generate());
+        generator.init();
     }
 }

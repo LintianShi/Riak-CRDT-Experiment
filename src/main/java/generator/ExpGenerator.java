@@ -1,5 +1,7 @@
 package generator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,17 +12,25 @@ public abstract class ExpGenerator {
     private int totalOps;
     private String pattern;
     private AtomicInteger atomicInteger = new AtomicInteger(0);
+    private List<RiakOperation> operations;
 
     public ExpGenerator(int totalOps, String pattern) {
         this.totalOps = totalOps;
         this.pattern = pattern;
+        this.operations = new ArrayList<>(totalOps);
     }
 
     protected abstract RiakOperation generateOperation();
 
-    public final RiakOperation generate() {
-        atomicInteger.incrementAndGet();
-        return generateOperation();
+    public final synchronized RiakOperation get() {
+        int index = atomicInteger.incrementAndGet();
+        return operations.get(index);
+    }
+
+    protected void init() {
+        for (int i = 0; i < totalOps; i++) {
+            operations.add(generateOperation());
+        }
     }
 
     protected int randInt(int bound) {

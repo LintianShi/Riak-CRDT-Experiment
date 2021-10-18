@@ -27,12 +27,10 @@ public abstract class RiakExpRunner {
 
     private static int SERVER_NUM = 3;
     private static int THREAD_PER_SERVER = 1;
-    private static int OP_PER_SEC = 1000;
-    private static int TOTAL_OPS = 300;
+    private static int TOTAL_OPS = 100;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
-    private double intervalTime;
     protected String dataType;
     protected Location testDataType;
     private ExpGenerator generator;
@@ -42,7 +40,6 @@ public abstract class RiakExpRunner {
 
     public RiakExpRunner() {
         expEnvironment = new RiakEnvironment(SERVER_NUM);
-        intervalTime = (double)(SERVER_NUM * THREAD_PER_SERVER) / OP_PER_SEC;
     }
 
     public void run() throws Exception {
@@ -63,7 +60,7 @@ public abstract class RiakExpRunner {
         CountDownLatch countDownLatch = new CountDownLatch(CLIENT_NUM);
         //线程绑定客户端
         for (int i = 0; i < CLIENT_NUM; i++) {
-            threadList.add(new Thread(new RiakClientThread(initClient(expEnvironment.newClient(), testDataType), generator, intervalTime, logs.get(i), countDownLatch)));
+            threadList.add(new Thread(new RiakClientThread(initClient(expEnvironment.newClient(), testDataType), generator, logs.get(i), countDownLatch)));
         }
         //启动线程
         Long startTime = System.currentTimeMillis();
@@ -95,7 +92,7 @@ public abstract class RiakExpRunner {
 
     private void outputTrace() {
         long ts = System.currentTimeMillis();
-        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(OP_PER_SEC) + "_" + Integer.toString(TOTAL_OPS) + "_" + Long.toString(ts);
+        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(TOTAL_OPS) + "_" + Long.toString(ts);
         File file = new File(filename);
         file.mkdir();
         try {
@@ -127,14 +124,12 @@ public abstract class RiakExpRunner {
 class RiakClientThread implements Runnable {
     private RiakExpClient riakClient;
     private ExpGenerator generator;
-    private long intervalTime;
     private RiakClientLog threadLog;
     private CountDownLatch countDownLatch;
 
-    public RiakClientThread(RiakExpClient client, ExpGenerator generator, double intervalTime, RiakClientLog threadLog, CountDownLatch countDownLatch) {
+    public RiakClientThread(RiakExpClient client, ExpGenerator generator, RiakClientLog threadLog, CountDownLatch countDownLatch) {
         this.riakClient = client;
         this.generator = generator;
-        this.intervalTime = (long)(intervalTime * 1000);
         this.threadLog = threadLog;
         this.countDownLatch = countDownLatch;
     }
@@ -142,13 +137,10 @@ class RiakClientThread implements Runnable {
     public void run() {
         while (generator.isRunning()) {
             try {
-                RiakOperation operation = generator.generate();
-                operation.setStartTime(System.currentTimeMillis());
+                RiakOperation operation = generator.get();
                 String retValue = riakClient.execute(operation);
-                operation.setEndTime(System.currentTimeMillis());
                 operation.setRetValue(retValue);
                 threadLog.appendLog(operation);
-                Thread.sleep(intervalTime);
             } catch (Exception e) {
                 e.printStackTrace();
             }
