@@ -22,8 +22,11 @@ public abstract class ExpGenerator {
 
     protected abstract RiakOperation generateOperation();
 
-    public final synchronized RiakOperation get() {
+    public synchronized RiakOperation get() {
         int index = atomicInteger.incrementAndGet();
+        if (index >= totalOps) {
+            return null;
+        }
         return operations.get(index);
     }
 
