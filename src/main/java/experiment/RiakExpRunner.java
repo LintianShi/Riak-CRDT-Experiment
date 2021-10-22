@@ -122,12 +122,12 @@ public abstract class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100000; i++) {
             RiakExpRunner runner = new SetRunner();
-            runner.setDataType("set322");
+            runner.setDataType("set311");
             runner.run();
         }
-        
+        Runtime.getRuntime().exec("./pack.sh");
     }
 }
 
