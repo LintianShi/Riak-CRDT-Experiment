@@ -146,13 +146,16 @@ class RiakClientThread implements Runnable {
 
     public void run() {
         while (generator.isRunning()) {
+            RiakOperation operation = generator.get();
             try {
-                RiakOperation operation = generator.get();
                 String retValue = riakClient.execute(operation);
                 operation.setRetValue(retValue);
                 threadLog.appendLog(operation);
-            } catch (Exception e) {
+            } catch (NullPointerException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                operation.setRetValue("null");
+                threadLog.appendLog(operation);
             }
         }
         countDownLatch.countDown();
