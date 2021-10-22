@@ -10,11 +10,6 @@ import generator.SetExpGenerator;
 import generator.ExpGenerator;
 
 public class SetRunner extends RiakExpRunner {
-    protected void initTestDataType() {
-        dataType = "Set";
-        testDataType = new Location(new Namespace("testset", "test"),"testdata");
-    }
-
     protected RiakExpClient initClient(RiakClient riakClient, Location location) {
         return new SetClient(riakClient, location);
     }

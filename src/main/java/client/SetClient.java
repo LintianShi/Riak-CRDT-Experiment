@@ -53,12 +53,7 @@ public class SetClient extends RiakExpClient {
         FetchSet fetch = new FetchSet.Builder(testDataType).build();
         FetchSet.Response response = this.riakClient.execute(fetch);
         RiakSet set = response.getDatatype();
-        if(set.contains(element)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return set.contains(element);
     }
 
     public String execute(RiakOperation operation) throws Exception {

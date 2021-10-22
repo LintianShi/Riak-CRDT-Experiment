@@ -25,9 +25,9 @@ import record.RiakClientLog;
 public abstract class RiakExpRunner {
     private RiakEnvironment expEnvironment;
 
-    private static int SERVER_NUM = 3;
+    private static int SERVER_NUM = 5;
     private static int THREAD_PER_SERVER = 1;
-    private static int TOTAL_OPS = 100;
+    private static int TOTAL_OPS = 15;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
@@ -40,6 +40,10 @@ public abstract class RiakExpRunner {
 
     public RiakExpRunner() {
         expEnvironment = new RiakEnvironment(SERVER_NUM);
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public void run() throws Exception {
@@ -84,7 +88,9 @@ public abstract class RiakExpRunner {
         outputTrace();
     }
 
-    protected abstract void initTestDataType();
+    private void initTestDataType() {
+        this.testDataType = new Location(new Namespace(dataType, "test"),"testdata");
+    }
 
     protected abstract RiakExpClient initClient(RiakClient riakClient, Location location);
 
@@ -116,8 +122,12 @@ public abstract class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        RiakExpRunner runner = new SetRunner();
-        runner.run();
+        for (int i = 0; i < 100; i++) {
+            RiakExpRunner runner = new SetRunner();
+            runner.setDataType("set322");
+            runner.run();
+        }
+        
     }
 }
 

@@ -10,13 +10,13 @@ public class SetExpGenerator extends ExpGenerator {
     private double proportionAdd;
     private double proportionRemove;
     private double proportionContains;
-    private int maxElement = 20;
+    private int maxElement = 4;
 
     public SetExpGenerator(int totalOps) {
         super(totalOps, "default");
-        proportionAdd = 0.6;
-        proportionRemove = 0.3;
-        proportionContains = 0.1;
+        proportionAdd = 0.34;
+        proportionRemove = 0.33;
+        proportionContains = 0.33;
         init();
     }
 
@@ -27,9 +27,9 @@ public class SetExpGenerator extends ExpGenerator {
             proportionRemove = 0.5;
             proportionContains = 0.2;
         } else {
-            proportionAdd = 0.6;
+            proportionAdd = 0.5;
             proportionRemove = 0.3;
-            proportionContains = 0.1;
+            proportionContains = 0.2;
         }
         init();
     }
