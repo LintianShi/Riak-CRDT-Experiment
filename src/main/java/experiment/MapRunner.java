@@ -10,6 +10,10 @@ import generator.MapExpGenerator;
 import generator.ExpGenerator;
 
 public class MapRunner extends RiakExpRunner {
+    public MapRunner(int n) {
+        super(n);
+    }
+
     protected client.RiakExpClient initClient(RiakClient riakClient, Location location) {
         return new MapClient(riakClient, location);
     }

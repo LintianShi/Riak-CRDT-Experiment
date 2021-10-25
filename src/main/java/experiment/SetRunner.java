@@ -10,6 +10,10 @@ import generator.SetExpGenerator;
 import generator.ExpGenerator;
 
 public class SetRunner extends RiakExpRunner {
+    public SetRunner(int n) {
+        super(n);
+    }
+
     protected RiakExpClient initClient(RiakClient riakClient, Location location) {
         return new SetClient(riakClient, location);
     }

@@ -10,13 +10,15 @@ public class SetExpGenerator extends ExpGenerator {
     private double proportionAdd;
     private double proportionRemove;
     private double proportionContains;
+    private double proportionSize;
     private int maxElement = 4;
 
     public SetExpGenerator(int totalOps) {
         super(totalOps, "default");
-        proportionAdd = 0.34;
-        proportionRemove = 0.33;
-        proportionContains = 0.33;
+        proportionAdd = 0.3;
+        proportionRemove = 0.3;
+        proportionContains = 0.2;
+        proportionSize = 0.2;
         init();
     }
 
@@ -24,12 +26,14 @@ public class SetExpGenerator extends ExpGenerator {
         super(totalOps, pattern);
         if (pattern.equals("ardominant")) {
             proportionAdd = 0.3;
-            proportionRemove = 0.5;
-            proportionContains = 0.2;
-        } else {
-            proportionAdd = 0.5;
             proportionRemove = 0.3;
             proportionContains = 0.2;
+            proportionSize = 0.2;
+        } else {
+            proportionAdd = 0.3;
+            proportionRemove = 0.3;
+            proportionContains = 0.2;
+            proportionSize = 0.2;
         }
         init();
     }
@@ -37,16 +41,19 @@ public class SetExpGenerator extends ExpGenerator {
     protected RiakOperation generateOperation() {
         double random = Math.random();
         RiakOperation operation = null;
-        if (random < proportionAdd) {
-            operation = new RiakOperation("add");
-        } else if (random < proportionAdd + proportionRemove) {
-            operation = new RiakOperation("remove");
+        if (random < proportionAdd + proportionRemove + proportionContains) {
+            int element = randInt(maxElement);
+            if (random < proportionAdd) {
+                operation = new RiakOperation("add");
+            } else if (random < proportionAdd + proportionRemove) {
+                operation = new RiakOperation("remove");
+            } else {
+                operation = new RiakOperation("contains");
+            }
+            operation.addArgument(Integer.toString(element));
         } else {
-            operation = new RiakOperation("contains");
+            operation = new RiakOperation("size");
         }
-
-        int element = randInt(maxElement);
-        operation.addArgument(Integer.toString(element));
         return operation;
     }
 

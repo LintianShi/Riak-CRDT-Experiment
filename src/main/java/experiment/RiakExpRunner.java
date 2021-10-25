@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 import client.SetClient;
 import client.RiakExpClient;
@@ -31,6 +34,7 @@ public abstract class RiakExpRunner {
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
+    private int n;
     protected String dataType;
     protected Location testDataType;
     private ExpGenerator generator;
@@ -38,7 +42,8 @@ public abstract class RiakExpRunner {
     private List<RiakClientLog> logs = new ArrayList<>();
 
 
-    public RiakExpRunner() {
+    public RiakExpRunner(int n) {
+        this.n = n;
         expEnvironment = new RiakEnvironment(SERVER_NUM);
     }
 
@@ -89,7 +94,7 @@ public abstract class RiakExpRunner {
     }
 
     private void initTestDataType() {
-        this.testDataType = new Location(new Namespace(dataType, "test"),"testdata");
+        this.testDataType = new Location(new Namespace(dataType, "test"),"testdata" + Integer.toString(n));
     }
 
     protected abstract RiakExpClient initClient(RiakClient riakClient, Location location);
@@ -98,13 +103,18 @@ public abstract class RiakExpRunner {
 
     private void outputTrace() {
         long ts = System.currentTimeMillis();
-        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(TOTAL_OPS) + "_" + Long.toString(ts);
-        File file = new File(filename);
-        file.mkdir();
+        String filename = "result/" + dataType + "_" + WORKLOAD_PATTERN + "_" + Integer.toString(SERVER_NUM) + "_" + Integer.toString(CLIENT_NUM) + "_" + Integer.toString(TOTAL_OPS) + "_" + Long.toString(ts) + ".trc";
         try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename)));
+            String header = Integer.toString(logs.size());
             for (int i = 0; i < logs.size(); i++) {
-                logs.get(i).outputLog(filename + "/" + Integer.toString(i) + ".trc");
+                header += " " + Integer.toString(logs.get(i).size());
             }
+            bw.write(header);
+            for (int i = 0; i < logs.size(); i++) {
+                logs.get(i).outputLog(bw);
+            }
+            bw.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,11 +133,10 @@ public abstract class RiakExpRunner {
 
     public static void main(String[] args) throws Exception {
         for (int i = 0; i < 100000; i++) {
-            RiakExpRunner runner = new SetRunner();
-            runner.setDataType("set311");
+            RiakExpRunner runner = new MapRunner(i);
+            runner.setDataType("map322");
             runner.run();
         }
-        Runtime.getRuntime().exec("./pack.sh");
     }
 }
 

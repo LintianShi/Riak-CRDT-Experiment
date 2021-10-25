@@ -15,11 +15,13 @@ public class RiakClientLog {
         operationList.add(riakOperation);
     }
 
-    public void outputLog(String filename) throws Exception {
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename)));
+    public int size() {
+        return operationList.size();
+    }
+
+    public void outputLog(BufferedWriter bw) throws Exception {
         for (RiakOperation operation : operationList) {
-            bw.write(operation.toString() + "\n");
+            bw.write("\n" + operation.toString());
         }
-        bw.close();
     }
 }

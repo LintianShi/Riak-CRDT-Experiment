@@ -56,9 +56,19 @@ public class SetClient extends RiakExpClient {
         return set.contains(element);
     }
 
+    private int size() throws ExecutionException, InterruptedException {
+        FetchSet fetch = new FetchSet.Builder(testDataType).build();
+        FetchSet.Response response = this.riakClient.execute(fetch);
+        RiakSet set = response.getDatatype();
+        return set.view().size();
+    }
+
     public String execute(RiakOperation operation) throws Exception {
         String operationName = operation.getOperationName();
-        String element = operation.getArguments().get(0);
+        String element = "dummy";
+        if (!operationName.equals("size")) {
+            element = operation.getArguments().get(0);
+        }
         return executeByArgs(operationName, element);
     }
 
@@ -77,11 +87,14 @@ public class SetClient extends RiakExpClient {
                 } else {
                     return "false";
                 }
+            } else if (operationName.equals("size")) {
+                int sz = size();
+                return Integer.toString(sz);
             } else {
                 throw new Exception("Invalid Op");
             }
         } catch (Exception e) {
-            throw new Exception(operationName + "_" + args[0]);
+            throw new Exception(operationName);
         }
         
     }

@@ -1,4 +1,3 @@
 #!/bin/bash
 echo "Hello World !";
-zip -r set311.zip result;
-rm -rf result/*;
+zip -r set322.zip result;

@@ -7,27 +7,31 @@ public class MapExpGenerator extends ExpGenerator {
     private double proportionPut;
     private double proportionGet;
     private double proportionContainsValue;
-    private int maxKey = 20;
+    private double proportionSize;
+    private int maxKey = 4;
     private int maxValue =Integer.MAX_VALUE;
 
     public MapExpGenerator(int totalOps) {
         super(totalOps, "default");
-        proportionPut = 0.5;
-        proportionGet = 0.25;
-        proportionContainsValue = 0.25;
+        proportionPut = 0.55;
+        proportionGet = 0.15;
+        proportionContainsValue = 0.15;
+        proportionSize = 0.15;
         init();
     }
 
     public MapExpGenerator(int totalOps, String pattern) {
         super(totalOps, pattern);
         if (pattern.equals("ardominant")) {
-            proportionPut = 0.8;
-            proportionGet = 0.1;
-            proportionContainsValue = 0.1;
-        } else {
-            proportionPut = 0.8;
+            proportionPut = 0.55;
             proportionGet = 0.15;
-            proportionContainsValue = 0.05;
+            proportionContainsValue = 0.15;
+            proportionSize = 0.15;
+        } else {
+            proportionPut = 0.55;
+            proportionGet = 0.15;
+            proportionContainsValue = 0.15;
+            proportionSize = 0.15;
         }
         init();
     }
@@ -45,10 +49,12 @@ public class MapExpGenerator extends ExpGenerator {
             operation = new RiakOperation("get");
             int key = randInt(maxKey);
             operation.addArgument(Integer.toString(key));
-        } else {
+        } else if (random < proportionPut + proportionGet + proportionContainsValue) {
             operation = new RiakOperation("containsValue");
             int key = randInt(maxValue);
             operation.addArgument(Integer.toString(key));
+        } else {
+            operation = new RiakOperation("size");
         }
         return operation;
     }

@@ -38,20 +38,19 @@ public class MapClient extends RiakExpClient {
     }
 
     private String get(String key) throws ExecutionException, InterruptedException {
-        String getResult = "";
         FetchMap fetchR = new FetchMap.Builder(testDataType)
                 .build();
         FetchMap.Response responseR = riakClient.execute(fetchR);
         RiakMap mapR = responseR.getDatatype();
         localMap = mapR.view();
         if(localMap.containsKey(BinaryValue.create(key))){
-            getResult = localMap.get(BinaryValue.create(key)).toString();
+            String getResult = localMap.get(BinaryValue.create(key)).toString();
             getResult = getResult.substring(1,getResult.length()-1);
+            return getResult;
         }
         else{
-            getResult = "null";
+            return "null";
         }
-        return getResult;
     }
 
     private boolean containsValue(String value) throws Exception{
@@ -75,6 +74,15 @@ public class MapClient extends RiakExpClient {
         return result;
     }
 
+    private int size() throws ExecutionException, InterruptedException {
+        FetchMap fetchR = new FetchMap.Builder(testDataType)
+                .build();
+        FetchMap.Response responseR = riakClient.execute(fetchR);
+        RiakMap mapR = responseR.getDatatype();
+        localMap = mapR.view();
+        return localMap.size();
+    }
+
     public String execute(RiakOperation operation) throws Exception {
         String operationName = operation.getOperationName();
         if (operationName.equals("get") || operationName.equals("containsValue")) {
@@ -84,6 +92,8 @@ public class MapClient extends RiakExpClient {
             String key = operation.getArguments().get(0);
             String value = operation.getArguments().get(1);
             return executeByArgs(operationName, key, value);
+        } else if (operationName.equals("size")) {
+            return executeByArgs(operationName, "dummy");
         } else {
             throw new Exception("Invalid Op");
         }
@@ -103,6 +113,9 @@ public class MapClient extends RiakExpClient {
                 } else {
                     return "false";
                 }
+            } else if (operationName.equals("size")) {
+                int sz = size();
+                return Integer.toString(sz);
             } else {
                 throw new Exception("Invalid Op");
             }
