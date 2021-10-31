@@ -133,8 +133,8 @@ public abstract class RiakExpRunner {
 
     public static void main(String[] args) throws Exception {
         for (int i = 0; i < 100000; i++) {
-            RiakExpRunner runner = new MapRunner(i);
-            runner.setDataType("map322");
+            RiakExpRunner runner = new SetRunner(i);
+            runner.setDataType("set312");
             runner.run();
         }
     }
