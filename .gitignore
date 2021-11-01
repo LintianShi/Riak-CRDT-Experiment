@@ -1,5 +1,7 @@
 input/
 out/
 target/
+result/
 *.trc
 *.zip
+*.out

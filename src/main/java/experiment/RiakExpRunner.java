@@ -30,7 +30,7 @@ public abstract class RiakExpRunner {
 
     private static int SERVER_NUM = 5;
     private static int THREAD_PER_SERVER = 1;
-    private static int TOTAL_OPS = 15;
+    private static int TOTAL_OPS = 16;
     private static String WORKLOAD_PATTERN = "default";
     private static int CLIENT_NUM = 3;
 
@@ -131,12 +131,36 @@ public abstract class RiakExpRunner {
         expEnvironment.shutdown();
     }
 
+    private static void removeDelay(String passwd) throws Exception  {
+        for (String ip : RiakEnvironment.availableIPs) {
+            SshConnect ssh = new SshConnect(ip, passwd);
+            ssh.remoteExecute("sudo tc qdisc del dev eth0 root");
+            ssh.close();
+        }
+    }
+
+    private static void setDelay(String passwd) throws Exception {
+        for (String ip : RiakEnvironment.availableIPs) {
+            SshConnect ssh = new SshConnect(ip, passwd);
+            ssh.remoteExecute("sudo tc qdisc add dev eth0 root handle 1: prio");
+            for (String p : RiakEnvironment.availableIPs) {
+                if (!ip.equals(p)) {
+                    ssh.remoteExecute("sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 100ms 20ms distribution normal limit 100000");
+                    ssh.remoteExecute("sudo tc filter add dev eth0 protocol ip parent 1: prio 1 u32 match ip dst " + p + " flowid 1:1");
+                }
+            }
+            ssh.close();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-        for (int i = 0; i < 100000; i++) {
+        RiakExpRunner.setDelay(args[0]);
+        for (int i = 0; i < 30000; i++) {
             RiakExpRunner runner = new SetRunner(i);
-            runner.setDataType("set312");
+            runner.setDataType("set321");
             runner.run();
         }
+        RiakExpRunner.removeDelay(args[0]);
     }
 }
 

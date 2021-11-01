@@ -12,7 +12,7 @@ public class RiakEnvironment {
     private final static int DEFAULT_MAX_CONNECTIONS = 500;
     private final static int DEFAULT_MIN_CONNECTIONS = 10;
     private final static int DEFAULT_RETRIES = 1;
-    private final static String availableIPs[] = {"172.24.81.136", "172.24.81.137", "172.24.81.132", "172.24.234.239", "172.24.234.240"};
+    public final static String availableIPs[] = {"172.24.81.136", "172.24.81.137", "172.24.81.132", "172.24.234.239", "172.24.234.240"};
     private final static int port = 8087;
 
     private RiakCluster riakCluster;
