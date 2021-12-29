@@ -143,9 +143,9 @@ public abstract class RiakExpRunner {
         for (String ip : RiakEnvironment.availableIPs) {
             SshConnect ssh = new SshConnect(ip, passwd);
             ssh.remoteExecute("sudo tc qdisc add dev eth0 root handle 1: prio");
+            ssh.remoteExecute("sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 80ms 60ms distribution normal limit 100000 loss 10%");
             for (String p : RiakEnvironment.availableIPs) {
                 if (!ip.equals(p)) {
-                    ssh.remoteExecute("sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 100ms 20ms distribution normal limit 100000");
                     ssh.remoteExecute("sudo tc filter add dev eth0 protocol ip parent 1: prio 1 u32 match ip dst " + p + " flowid 1:1");
                 }
             }
@@ -154,13 +154,13 @@ public abstract class RiakExpRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        RiakExpRunner.setDelay(args[0]);
-        for (int i = 0; i < 30000; i++) {
-            RiakExpRunner runner = new SetRunner(i);
-            runner.setDataType("set321");
+        // RiakExpRunner.setDelay(args[0]);
+        for (int i = 0; i < 400000; i++) {
+            RiakExpRunner runner = new MapRunner(i);
+            runner.setDataType("map321");
             runner.run();
         }
-        RiakExpRunner.removeDelay(args[0]);
+        // RiakExpRunner.removeDelay(args[0]);
     }
 }
 

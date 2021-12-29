@@ -28,9 +28,9 @@ public class MapExpGenerator extends ExpGenerator {
             proportionContainsValue = 0.15;
             proportionSize = 0.15;
         } else {
-            proportionPut = 0.55;
-            proportionGet = 0.15;
-            proportionContainsValue = 0.15;
+            proportionPut = 0.60;
+            proportionGet = 0.25;
+            proportionContainsValue = 0.0;
             proportionSize = 0.15;
         }
         init();
@@ -49,11 +49,13 @@ public class MapExpGenerator extends ExpGenerator {
             operation = new RiakOperation("get");
             int key = randInt(maxKey);
             operation.addArgument(Integer.toString(key));
-        } else if (random < proportionPut + proportionGet + proportionContainsValue) {
-            operation = new RiakOperation("containsValue");
-            int key = randInt(maxValue);
-            operation.addArgument(Integer.toString(key));
-        } else {
+        } 
+        // else if (random < proportionPut + proportionGet + proportionContainsValue) {
+        //     operation = new RiakOperation("containsValue");
+        //     int key = randInt(maxValue);
+        //     operation.addArgument(Integer.toString(key));
+        // } 
+        else {
             operation = new RiakOperation("size");
         }
         return operation;
